@@ -15,8 +15,6 @@ import android.os.Handler;
 import android.support.wearable.view.WatchViewStub;
 import android.util.Log;
 import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.RelativeLayout;
@@ -47,8 +45,20 @@ public class MainActivity extends Activity implements
     Animation animation;
     private GoogleApiClient mGoogleApiClient;
     Location mLastLocation;
+
+    /**
+     * variables for compass sensing
+     */
     private SensorManager mSensorManager;
-    private Sensor mCompass;
+    private Sensor mAccelerometer;
+    private Sensor mMagnetometer;
+    private float[] mLastAccelerometer = new float[3];
+    private float[] mLastMagnetometer = new float[3];
+    private boolean mLastAccelerometerSet = false;
+    private boolean mLastMagnetometerSet = false;
+    private float[] mR = new float[9];
+    private float[] mOrientation = new float[3];
+    private float mCurrentDegree = 0f;
 
     private double latitude;
     private double longitude;
@@ -62,7 +72,8 @@ public class MainActivity extends Activity implements
         final WatchViewStub stub = (WatchViewStub) findViewById(R.id.watch_view_stub);
 
         mSensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
-        mCompass = mSensorManager.getDefaultSensor(Sensor.TYPE_GEOMAGNETIC_ROTATION_VECTOR);
+        mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        mMagnetometer = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
 
         configureGPS();
 
@@ -148,7 +159,22 @@ public class MainActivity extends Activity implements
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
     }
 
+    @Override
     public void onSensorChanged(SensorEvent event) {
+        if (event.sensor == mAccelerometer) {
+            System.arraycopy(event.values, 0, mLastAccelerometer, 0, event.values.length);
+            mLastAccelerometerSet = true;
+        } else if (event.sensor == mMagnetometer) {
+            System.arraycopy(event.values, 0, mLastMagnetometer, 0, event.values.length);
+            mLastMagnetometerSet = true;
+        }
+        if (mLastAccelerometerSet && mLastMagnetometerSet) {
+            SensorManager.getRotationMatrix(mR, null, mLastAccelerometer, mLastMagnetometer);
+            SensorManager.getOrientation(mR, mOrientation);
+            float azimuthInRadians = mOrientation[0];
+            float azimuthInDegress = (float)(Math.toDegrees(azimuthInRadians)+360)%360;
+            direction = -azimuthInDegress;
+        }
 
         float olddirection;
         olddirection = direction;
@@ -161,7 +187,6 @@ public class MainActivity extends Activity implements
         if (bigarrow != null) {
             bigarrow.setRotation((bigarrow.getRotation()+delta)%360);
         }
-
     }
 
 
@@ -236,13 +261,15 @@ public class MainActivity extends Activity implements
                     .removeLocationUpdates(mGoogleApiClient, (com.google.android.gms.location.LocationListener) this);
         }
         mGoogleApiClient.disconnect();
-        mSensorManager.unregisterListener(this);
+        mSensorManager.unregisterListener(this, mAccelerometer);
+        mSensorManager.unregisterListener(this, mMagnetometer);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        mSensorManager.registerListener(this, mCompass, SensorManager.SENSOR_DELAY_NORMAL);
+        mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_GAME);
+        mSensorManager.registerListener(this, mMagnetometer, SensorManager.SENSOR_DELAY_GAME);
     }
 
 
