@@ -5,6 +5,9 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.LayerDrawable;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.location.Location;
 import android.os.Bundle;
@@ -30,7 +33,8 @@ import com.google.android.gms.wearable.Wearable;
 public class MainActivity extends Activity implements
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
-        LocationListener {
+        LocationListener,
+        SensorEventListener {
 
     private TextView mTextView;
 
@@ -40,6 +44,8 @@ public class MainActivity extends Activity implements
     Animation animation;
     private GoogleApiClient mGoogleApiClient;
     Location mLastLocation;
+    private SensorManager mSensorManager;
+    private Sensor mCompass;
 
     private double latitude;
     private double longitude;
@@ -51,13 +57,10 @@ public class MainActivity extends Activity implements
         setContentView(R.layout.activity_main);
         final WatchViewStub stub = (WatchViewStub) findViewById(R.id.watch_view_stub);
 
-        configureGPS();
+        mSensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
+        mCompass = mSensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION);
 
-        float[] rotate = new float[3];
-        float[] rotMat = new float[9];
-        SensorManager.getOrientation(getRotationMatrix(rotMat, null, ), rotate);
-        direction = rotate[2]/6.28*360;
-        Log.d("Compass Stuff", "direction: " + direction);
+        configureGPS();
 
                 stub.setOnLayoutInflatedListener(new WatchViewStub.OnLayoutInflatedListener() {
             @Override
@@ -119,6 +122,13 @@ public class MainActivity extends Activity implements
             Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.rotate);
             startAnimation(animation);
         }
+    }
+
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+    }
+
+    public void onSensorChanged(SensorEvent event) {
+        direction = Math.round(event.values[0]);
     }
 
 
