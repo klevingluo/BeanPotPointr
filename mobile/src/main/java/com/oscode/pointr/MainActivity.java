@@ -18,6 +18,8 @@ import com.google.android.gms.wearable.PutDataMapRequest;
 import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
 
+import java.util.ArrayList;
+
 
 public class MainActivity extends ActionBarActivity implements
         DataApi.DataListener,
@@ -30,8 +32,7 @@ public class MainActivity extends ActionBarActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        YelpAPI yelper = new YelpAPI();
-        yelper.execute();
+        ArrayList<Locals> test = JSONProcessor.getLocations();
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addApi(Wearable.API)
