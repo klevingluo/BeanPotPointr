@@ -133,6 +133,7 @@ public class MainActivity extends Activity implements
 
     @Override
     public void onLocationChanged(Location location) {
+        location.getLatitude();
 
     }
 
