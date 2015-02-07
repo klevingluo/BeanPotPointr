@@ -54,8 +54,10 @@ public class MainActivity extends Activity implements
         configureGPS();
 
         float[] rotate = new float[3];
-        SensorManager.getOrientation(null, rotate);
-        direction = rotate[2];
+        float[] rotMat = new float[9];
+        SensorManager.getOrientation(getRotationMatrix(rotMat, null, ), rotate);
+        direction = rotate[2]/6.28*360;
+        Log.d("Compass Stuff", "direction: " + direction);
 
                 stub.setOnLayoutInflatedListener(new WatchViewStub.OnLayoutInflatedListener() {
             @Override
