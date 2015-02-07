@@ -52,7 +52,7 @@ public class MainActivity extends Activity implements
 
     private double latitude;
     private double longitude;
-    private double direction;
+    private float direction;
     ArrayList<LittleArrow> arrows = new ArrayList<LittleArrow>();
 
     @Override
@@ -62,7 +62,7 @@ public class MainActivity extends Activity implements
         final WatchViewStub stub = (WatchViewStub) findViewById(R.id.watch_view_stub);
 
         mSensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
-        mCompass = mSensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION);
+        mCompass = mSensorManager.getDefaultSensor(Sensor.TYPE_GEOMAGNETIC_ROTATION_VECTOR);
 
         configureGPS();
 
@@ -74,8 +74,8 @@ public class MainActivity extends Activity implements
                 stars = (LayerDrawable) ratingBar.getProgressDrawable();
                 stars.getDrawable(2).setColorFilter(Color.rgb(0x2d, 0x9c, 0x93), PorterDuff.Mode.SRC_ATOP);
                 bigarrow = (ImageView) findViewById(R.id.big_arrow);
-                animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.rotate);
-                bigarrow.startAnimation(animation);
+//                animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.rotate);
+//                bigarrow.startAnimation(animation);
                 final RelativeLayout relativeLayout = (RelativeLayout) findViewById(R.id.relLayout);
                 Handler handler = new Handler();
                 handler.postDelayed(new Runnable(){
@@ -149,7 +149,19 @@ public class MainActivity extends Activity implements
     }
 
     public void onSensorChanged(SensorEvent event) {
-        direction = Math.round(event.values[0]);
+
+        float olddirection;
+        olddirection = direction;
+        direction = (float) (event.values[0]);
+        Log.d("SensorChange", "" + direction);
+        float delta = direction - olddirection;
+        for (LittleArrow a : arrows) {
+            a.rotate(delta);
+        }
+        if (bigarrow != null) {
+            bigarrow.setRotation((bigarrow.getRotation()+delta)%360);
+        }
+
     }
 
 
@@ -224,7 +236,15 @@ public class MainActivity extends Activity implements
                     .removeLocationUpdates(mGoogleApiClient, (com.google.android.gms.location.LocationListener) this);
         }
         mGoogleApiClient.disconnect();
+        mSensorManager.unregisterListener(this);
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mSensorManager.registerListener(this, mCompass, SensorManager.SENSOR_DELAY_NORMAL);
+    }
+
 
     @Override
     protected void onStart() {
