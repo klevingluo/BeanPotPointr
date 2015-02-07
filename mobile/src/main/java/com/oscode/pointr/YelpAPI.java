@@ -29,11 +29,13 @@ import org.scribe.oauth.OAuthService;
 public class YelpAPI extends AsyncTask<Void, Void, Void>{
 
     private static final String API_HOST = "api.yelp.com";
-    private static final String DEFAULT_TERM = "dinner";
-    private static final String DEFAULT_LOCATION = "San Francisco, CA";
-    private static final int SEARCH_LIMIT = 3;
     private static final String SEARCH_PATH = "/v2/search";
     private static final String BUSINESS_PATH = "/v2/business";
+    private static final int SEARCH_LIMIT = 30;
+    private static final int SORT_TYPE = 1;
+    private String term = "dinner";
+    private String longitude = "0";
+    private String latitude = "0";
 
     /*
      * Update OAuth credentials below from the Yelp Developers API site:
@@ -44,8 +46,10 @@ public class YelpAPI extends AsyncTask<Void, Void, Void>{
     private static final String TOKEN = "w3-nGeLXLZ03oC0uqnqtJmaBj4wPEbM5";
     private static final String TOKEN_SECRET = "JWbA2yAvWzCiPYr2rxcF2mUwBKI";
 
-    OAuthService service;
-    Token accessToken;
+    private OAuthService service;
+    private Token accessToken;
+    private JSONObject data;
+    private boolean isUpdated = false;
 
     /**
      * Setup the Yelp API OAuth credentials.
@@ -75,14 +79,13 @@ public class YelpAPI extends AsyncTask<Void, Void, Void>{
      * See <a href="http://www.yelp.com/developers/documentation/v2/search_api">Yelp Search API V2</a>
      * for more info.
      *
-     * @param term <tt>String</tt> of the search term to be queried
-     * @param location <tt>String</tt> of the location
      * @return <tt>String</tt> JSON Response
      */
-    public String searchForBusinessesByLocation(String term, String location) {
+    public String searchForBusinessesByLocation() {
         OAuthRequest request = createOAuthRequest(SEARCH_PATH);
         request.addQuerystringParameter("term", term);
-        request.addQuerystringParameter("location", location);
+        request.addQuerystringParameter("latitude", latitude);
+        request.addQuerystringParameter("longitude", longitude);
         request.addQuerystringParameter("limit", String.valueOf(SEARCH_LIMIT));
         return sendRequestAndGetResponse(request);
     }
@@ -131,11 +134,10 @@ public class YelpAPI extends AsyncTask<Void, Void, Void>{
      * the Business API.
      *
      * @param yelpApi <tt>YelpAPI</tt> service instance
-     * @param yelpApiCli <tt>YelpAPICLI</tt> command line arguments
      */
-    private static void queryAPI(YelpAPI yelpApi, YelpAPICLI yelpApiCli) {
+    private static JSONObject queryAPI(YelpAPI yelpApi) {
         String searchResponseJSON =
-                yelpApi.searchForBusinessesByLocation(yelpApiCli.term, yelpApiCli.location);
+                yelpApi.searchForBusinessesByLocation();
 
         JSONObject parser = null;
         try {
@@ -144,24 +146,13 @@ public class YelpAPI extends AsyncTask<Void, Void, Void>{
             Log.e("IMPORTANT_TAG", "json exception");
         }
         JSONObject response = parser;
-        Log.e("IMPORTANT_TAG", response.toString());
+        return response;
     }
 
     @Override
     protected Void doInBackground(Void... params) {
-        main(new String[0]);
+        this.data = queryYelp();
         return null;
-    }
-
-    /**
-     * Command-line interface for the sample Yelp API runner.
-     */
-    private static class YelpAPICLI {
-        @Parameter(names = {"-q", "--term"}, description = "Search Query Term")
-        public String term = DEFAULT_TERM;
-
-        @Parameter(names = {"-l", "--location"}, description = "Location to be Queried")
-        public String location = DEFAULT_LOCATION;
     }
 
     /**
@@ -169,11 +160,33 @@ public class YelpAPI extends AsyncTask<Void, Void, Void>{
      * <p>
      * After entering your OAuth credentials, execute <tt><b>run.sh</b></tt> to run this example.
      */
-    public void main(String[] args) {
-        YelpAPICLI yelpApiCli = new YelpAPICLI();
-        new JCommander(yelpApiCli, args);
-
+    private JSONObject queryYelp() {
         YelpAPI yelpApi = new YelpAPI(CONSUMER_KEY, CONSUMER_SECRET, TOKEN, TOKEN_SECRET);
-        queryAPI(yelpApi, yelpApiCli);
+        return queryAPI(yelpApi);
+    }
+
+    public void update(String term, String latitude, String longitude) {
+        this.term = term;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.isUpdated = false;
+        this.doInBackground();
+    }
+
+    @Override
+    protected void onPostExecute(Void aVoid) {
+        super.onPostExecute(aVoid);
+        this.isUpdated = true;
+    }
+
+    public JSONObject getData() {
+        while(!isUpdated) {
+            try {
+                wait(10);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        return this.data;
     }
 }
