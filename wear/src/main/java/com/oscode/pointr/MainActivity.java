@@ -62,7 +62,8 @@ public class MainActivity extends Activity implements
 
     private double latitude;
     private double longitude;
-    private float direction;
+    private float trueDirection;
+    private float direction = 0;
     ArrayList<LittleArrow> arrows = new ArrayList<LittleArrow>();
 
     @Override
@@ -173,17 +174,16 @@ public class MainActivity extends Activity implements
             SensorManager.getOrientation(mR, mOrientation);
             float azimuthInRadians = mOrientation[0];
             float azimuthInDegress = (float)(Math.toDegrees(azimuthInRadians)+360)%360;
-            float olddirection;
-            olddirection = direction;
-            direction = -azimuthInDegress;
+            trueDirection = -azimuthInDegress;
             Log.d("SensorChange", "" + direction);
-            float delta = direction - olddirection;
+            float delta = (float) ((direction - trueDirection) * 0.95);
             for (LittleArrow a : arrows) {
                 a.rotate(delta);
             }
             if (bigarrow != null) {
                 bigarrow.setRotation((bigarrow.getRotation()+delta)%360);
             }
+            direction += delta;
         }
 
 
