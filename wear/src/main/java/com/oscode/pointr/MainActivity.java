@@ -1,24 +1,35 @@
 package com.oscode.pointr;
 
-import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.LayerDrawable;
+import android.location.Location;
+import android.location.LocationListener;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.wearable.view.WatchViewStub;
-import android.view.ViewGroup;
+import android.util.Log;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-public class MainActivity extends Activity {
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.Result;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.wearable.Wearable;
+
+public class MainActivity extends Activity implements
+        GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener,
+        LocationListener {
 
     private TextView mTextView;
 
@@ -26,13 +37,15 @@ public class MainActivity extends Activity {
     LayerDrawable stars;
     ImageView bigarrow;
     Animation animation;
+    private GoogleApiClient mGoogleApiClient;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         final WatchViewStub stub = (WatchViewStub) findViewById(R.id.watch_view_stub);
 
-
+        configureGPS();
 
         stub.setOnLayoutInflatedListener(new WatchViewStub.OnLayoutInflatedListener() {
             @Override
@@ -92,5 +105,80 @@ public class MainActivity extends Activity {
             Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.rotate);
             startAnimation(animation);
         }
+    }
+
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        LocationRequest locationRequest = LocationRequest.create()
+                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+                .setInterval(3000)
+                .setFastestInterval(3000);
+
+        LocationServices.FusedLocationApi
+                .requestLocationUpdates(mGoogleApiClient, locationRequest, (com.google.android.gms.location.LocationListener) this)
+                .setResultCallback(new ResultCallback() {
+                    @Override
+                    public void onResult(Result status) {
+                        if (status.getStatus().isSuccess()) {
+                            if (Log.isLoggable("IMPORTANT_TAG", Log.DEBUG)) {
+                                Log.d("IMPORTANT_TAG", "Successfully requested location updates");
+                            }
+                        } else {
+                            Log.e("IMPORTANT_TAG", "Failed in requesting location updates, ");
+                        }
+                    }
+                });
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+
+    }
+
+    private void configureGPS() {
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addApi(LocationServices.API)
+                .addApi(Wearable.API)  // used for data layer API
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .build();
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+        if (Log.isLoggable("IMPORTANT_TAG", Log.DEBUG)) {
+            Log.d("IMPORTANT_TAG", "connection to location client suspended");
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (mGoogleApiClient.isConnected()) {
+            LocationServices.FusedLocationApi
+                    .removeLocationUpdates(mGoogleApiClient, (com.google.android.gms.location.LocationListener) this);
+        }
+        mGoogleApiClient.disconnect();
     }
 }
