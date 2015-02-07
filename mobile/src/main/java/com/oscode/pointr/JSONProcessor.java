@@ -24,11 +24,20 @@ public class JSONProcessor {
         if (redownload || locations == null) {
             JSONArray data = null;
             try {
+                yelpAPI.execute();
+                while(yelpAPI.getData() == null){
+                    try {
+                        Thread.sleep(3000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
                 data = yelpAPI.getData().getJSONArray("businesses");
             } catch (JSONException e) {
                 e.printStackTrace();
                 Log.e("IMPORTANT_TAG", e.getStackTrace().toString());
             }
+            locations = new ArrayList<Locals>();
             for (int i = 0; i < data.length(); i++) {
                 try {
                     JSONObject temp = data.getJSONObject(i);

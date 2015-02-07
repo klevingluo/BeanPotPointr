@@ -14,11 +14,10 @@ public class Locals {
     public Locals(JSONObject obj) {
         try {
             this.name = obj.getString("name");
-            this.rating = obj.getDouble("avg_rating");
-            this.distance = obj.getDouble("distance");
+            this.rating = obj.getDouble("rating");
             this.description = obj.getString("snippet_text");
-            this.latitude = obj.getJSONObject("region").getJSONObject("center").getDouble("latitude");
-            this.longitude = obj.getJSONObject("region").getJSONObject("center").getDouble("longitude");
+            this.latitude = obj.getJSONObject("location").getJSONObject("coordinate").getDouble("latitude");
+            this.longitude = obj.getJSONObject("location").getJSONObject("coordinate").getDouble("longitude");
         } catch (JSONException e) {
             e.printStackTrace();
         }

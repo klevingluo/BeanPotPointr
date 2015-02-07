@@ -28,7 +28,7 @@ public class YelpAPI extends AsyncTask<Void, Void, Void>{
     private static final String API_HOST = "api.yelp.com";
     private static final String SEARCH_PATH = "/v2/search";
     private static final String BUSINESS_PATH = "/v2/business";
-    private static final int SEARCH_LIMIT = 30;
+    private static final int SEARCH_LIMIT = 19;
     private static final int SORT_TYPE = 1;
     private String term = "food";
     private String longitude = "0";
@@ -81,8 +81,7 @@ public class YelpAPI extends AsyncTask<Void, Void, Void>{
     public String searchForBusinessesByLocation() {
         OAuthRequest request = createOAuthRequest(SEARCH_PATH);
         request.addQuerystringParameter("term", term);
-        request.addQuerystringParameter("latitude", latitude);
-        request.addQuerystringParameter("longitude", longitude);
+        request.addQuerystringParameter("ll", latitude+","+longitude);
         request.addQuerystringParameter("limit", String.valueOf(SEARCH_LIMIT));
         return sendRequestAndGetResponse(request);
     }
@@ -121,7 +120,7 @@ public class YelpAPI extends AsyncTask<Void, Void, Void>{
     private static JSONObject queryAPI(YelpAPI yelpApi) {
         String searchResponseJSON =
                 yelpApi.searchForBusinessesByLocation();
-
+        Log.e("TEST", searchResponseJSON.toString());
         JSONObject parser = null;
         try {
             parser = new JSONObject(searchResponseJSON);
@@ -133,6 +132,7 @@ public class YelpAPI extends AsyncTask<Void, Void, Void>{
 
     @Override
     protected Void doInBackground(Void... params) {
+        Log.e("TEST", "queryingYelp");
         this.data = queryYelp();
         return null;
     }
@@ -144,10 +144,11 @@ public class YelpAPI extends AsyncTask<Void, Void, Void>{
      */
     private JSONObject queryYelp() {
         YelpAPI yelpApi = new YelpAPI(CONSUMER_KEY, CONSUMER_SECRET, TOKEN, TOKEN_SECRET);
+        Log.e("TEST", "queryingAPI");
         return queryAPI(yelpApi);
     }
 
-    private void update(String latitude, String longitude) {
+    public void update(String latitude, String longitude) {
         this.latitude = latitude;
         this.longitude = longitude;
         this.isUpdated = false;
@@ -161,14 +162,15 @@ public class YelpAPI extends AsyncTask<Void, Void, Void>{
     }
 
     public JSONObject getData() {
-        //TODO: call GPS function and pass output into update function
-        while(!isUpdated) {
-            try {
-                wait(10);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
+//        this.update("0", "0");
+//        //TODO: call GPS function and pass output into update function
+//        while(!isUpdated) {
+//            try {
+//                Thread.sleep(10);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//        }
         return this.data;
     }
 }
