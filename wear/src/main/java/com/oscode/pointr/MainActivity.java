@@ -173,20 +173,23 @@ public class MainActivity extends Activity implements
             SensorManager.getOrientation(mR, mOrientation);
             float azimuthInRadians = mOrientation[0];
             float azimuthInDegress = (float)(Math.toDegrees(azimuthInRadians)+360)%360;
+            float olddirection;
+            olddirection = direction;
             direction = -azimuthInDegress;
+            Log.d("SensorChange", "" + direction);
+            float delta = direction - olddirection;
+            for (LittleArrow a : arrows) {
+                a.rotate(delta);
+            }
+            if (bigarrow != null) {
+                bigarrow.setRotation((bigarrow.getRotation()+delta)%360);
+            }
         }
 
-        float olddirection;
-        olddirection = direction;
-        direction = (float) (event.values[0]);
-        Log.d("SensorChange", "" + direction);
-        float delta = direction - olddirection;
-        for (LittleArrow a : arrows) {
-            a.rotate(delta);
-        }
-        if (bigarrow != null) {
-            bigarrow.setRotation((bigarrow.getRotation()+delta)%360);
-        }
+
+//        direction = (float) (event.values[0]);
+
+
     }
 
 
