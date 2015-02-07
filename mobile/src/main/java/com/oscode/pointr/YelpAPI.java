@@ -3,9 +3,6 @@ package com.oscode.pointr;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.beust.jcommander.JCommander;
-import com.beust.jcommander.Parameter;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.scribe.builder.ServiceBuilder;
@@ -33,7 +30,7 @@ public class YelpAPI extends AsyncTask<Void, Void, Void>{
     private static final String BUSINESS_PATH = "/v2/business";
     private static final int SEARCH_LIMIT = 30;
     private static final int SORT_TYPE = 1;
-    private String term = "dinner";
+    private String term = "food";
     private String longitude = "0";
     private String latitude = "0";
 
@@ -91,20 +88,6 @@ public class YelpAPI extends AsyncTask<Void, Void, Void>{
     }
 
     /**
-     * Creates and sends a request to the Business API by business ID.
-     * <p>
-     * See <a href="http://www.yelp.com/developers/documentation/v2/business">Yelp Business API V2</a>
-     * for more info.
-     *
-     * @param businessID <tt>String</tt> business ID of the requested business
-     * @return <tt>String</tt> JSON Response
-     */
-    public String searchByBusinessId(String businessID) {
-        OAuthRequest request = createOAuthRequest(BUSINESS_PATH + "/" + businessID);
-        return sendRequestAndGetResponse(request);
-    }
-
-    /**
      * Creates and returns an {@link OAuthRequest} based on the API endpoint specified.
      *
      * @param path API endpoint to be queried
@@ -145,8 +128,7 @@ public class YelpAPI extends AsyncTask<Void, Void, Void>{
         } catch (JSONException e) {
             Log.e("IMPORTANT_TAG", "json exception");
         }
-        JSONObject response = parser;
-        return response;
+        return parser;
     }
 
     @Override
@@ -165,8 +147,7 @@ public class YelpAPI extends AsyncTask<Void, Void, Void>{
         return queryAPI(yelpApi);
     }
 
-    public void update(String term, String latitude, String longitude) {
-        this.term = term;
+    private void update(String latitude, String longitude) {
         this.latitude = latitude;
         this.longitude = longitude;
         this.isUpdated = false;
@@ -180,6 +161,7 @@ public class YelpAPI extends AsyncTask<Void, Void, Void>{
     }
 
     public JSONObject getData() {
+        //TODO: call GPS function and pass output into update function
         while(!isUpdated) {
             try {
                 wait(10);
