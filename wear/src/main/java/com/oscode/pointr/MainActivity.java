@@ -13,6 +13,7 @@ import android.support.wearable.view.WatchViewStub;
 import android.util.Log;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.RelativeLayout;
@@ -26,6 +27,8 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.wearable.Wearable;
+
+import java.util.ArrayList;
 
 public class MainActivity extends Activity implements
         GoogleApiClient.ConnectionCallbacks,
@@ -44,6 +47,7 @@ public class MainActivity extends Activity implements
     private double latitude;
     private double longitude;
     private double direction;
+    ArrayList<LittleArrow> arrows = new ArrayList<LittleArrow>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,25 +78,29 @@ public class MainActivity extends Activity implements
                 handler.postDelayed(new Runnable(){
                     @Override
                     public void run() {
-                        relativeLayout.addView(new LittleArrow(getApplicationContext()));
+                        arrows.add(new LittleArrow(getApplicationContext(), 35));
+                        relativeLayout.addView(arrows.get(0));
                     }
                 }, 2000);
                 handler.postDelayed(new Runnable(){
                     @Override
                     public void run() {
-                        relativeLayout.addView(new LittleArrow(getApplicationContext()));
+                        arrows.add(new LittleArrow(getApplicationContext(), 90));
+                        relativeLayout.addView(arrows.get(1));
                     }
                 }, 3000);
                 handler.postDelayed(new Runnable(){
                     @Override
                     public void run() {
-                        relativeLayout.addView(new LittleArrow(getApplicationContext()));
+                        arrows.add(new LittleArrow(getApplicationContext(), 270));
+                        relativeLayout.addView(arrows.get(2));
                     }
                 }, 4000);
                 handler.postDelayed(new Runnable(){
                     @Override
                     public void run() {
-                        relativeLayout.addView(new LittleArrow(getApplicationContext()));
+                        arrows.add(new LittleArrow(getApplicationContext(), 300));
+                        relativeLayout.addView(arrows.get(3));
                         Log.d("Pointr", "last point loaded");
                     }
                 }, 5000);
@@ -109,15 +117,28 @@ public class MainActivity extends Activity implements
     }
     class LittleArrow extends ImageView {
 
-        public LittleArrow(Context context) {
+        public float getDegree() {
+            return degree;
+        }
+
+        public void setDegree(float degree) {
+            this.degree = degree;
+        }
+
+        private float degree = 0.0f;
+        public LittleArrow(Context context, float d) {
             super(context);
             this.setImageResource(R.drawable.small_arrow);
+            degree = d;
             setScaleType(ScaleType.FIT_START);
             RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.MATCH_PARENT);
             layoutParams.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
             setLayoutParams(layoutParams);
-            Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.rotate);
-            startAnimation(animation);
+            setRotation(degree);
+        }
+
+        public void rotate(float delta) {
+            setRotation(degree = (degree + delta) % 360);
         }
     }
 
