@@ -6,7 +6,6 @@ import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.LayerDrawable;
 import android.location.Location;
-import android.location.LocationListener;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.wearable.view.WatchViewStub;
@@ -24,6 +23,7 @@ import com.google.android.gms.common.api.Result;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.wearable.Wearable;
 
 public class MainActivity extends Activity implements
@@ -38,6 +38,7 @@ public class MainActivity extends Activity implements
     ImageView bigarrow;
     Animation animation;
     private GoogleApiClient mGoogleApiClient;
+    Location mLastLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,8 +82,10 @@ public class MainActivity extends Activity implements
                     @Override
                     public void run() {
                         relativeLayout.addView(new LittleArrow(getApplicationContext()));
+                        Log.d("Pointr", "last point loaded");
                     }
                 }, 5000);
+
             }
         });
 
@@ -116,7 +119,7 @@ public class MainActivity extends Activity implements
                 .setFastestInterval(3000);
 
         LocationServices.FusedLocationApi
-                .requestLocationUpdates(mGoogleApiClient, locationRequest, (com.google.android.gms.location.LocationListener) this)
+                .requestLocationUpdates(mGoogleApiClient, locationRequest, (LocationListener) this)
                 .setResultCallback(new ResultCallback() {
                     @Override
                     public void onResult(Result status) {
@@ -129,28 +132,23 @@ public class MainActivity extends Activity implements
                         }
                     }
                 });
+        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
+                mGoogleApiClient);
+        if (mLastLocation != null) {
+            Log.d("OUR GPS", "Location: " + mLastLocation.getLatitude() + ", " + mLastLocation.getLongitude());
+        }
+        else {
+            Log.d("OUR GPS", "Location: null");
+        }
+
     }
 
     @Override
     public void onLocationChanged(Location location) {
-        location.getLatitude();
-
+        Log.d("OUR GPS", "Location: " + location.getLatitude() + ", " + location.getLongitude());
     }
 
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
 
-    }
-
-    @Override
-    public void onProviderEnabled(String provider) {
-
-    }
-
-    @Override
-    public void onProviderDisabled(String provider) {
-
-    }
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
@@ -181,5 +179,11 @@ public class MainActivity extends Activity implements
                     .removeLocationUpdates(mGoogleApiClient, (com.google.android.gms.location.LocationListener) this);
         }
         mGoogleApiClient.disconnect();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mGoogleApiClient.connect();
     }
 }
