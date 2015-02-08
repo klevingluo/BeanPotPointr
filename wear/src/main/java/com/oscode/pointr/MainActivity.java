@@ -50,6 +50,7 @@ public class MainActivity extends Activity implements
         DataApi.DataListener {
 
     private TextView mTextView;
+    static final float ALPHA = 0.25f;
 
     RatingBar ratingBar;
     LayerDrawable stars;
@@ -253,18 +254,31 @@ public class MainActivity extends Activity implements
         public void rotate(float delta) {
             setRotation(degree = (degree + delta) % 360);
         }
+        public void setRotate(float d) {
+            setRotation(d);
+        }
     }
 
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
+    }
+
+    protected float[] lowPass(float[] input, float[] output) {
+        if (output == null) return input;
+        for (int i=0; i<input.length; i++) {
+            output[i] = output[i] + ALPHA * (input[i] - output[i]);
+        }
+        return output;
     }
 
     @Override
     public void onSensorChanged(SensorEvent event) {
         if (event.sensor == mAccelerometer) {
             System.arraycopy(event.values, 0, mLastAccelerometer, 0, event.values.length);
+            mLastAccelerometer = lowPass(mLastAccelerometer.clone(), mLastAccelerometer);
             mLastAccelerometerSet = true;
         } else if (event.sensor == mMagnetometer) {
             System.arraycopy(event.values, 0, mLastMagnetometer, 0, event.values.length);
+            mLastMagnetometer = lowPass(mLastMagnetometer.clone(), mLastMagnetometer);
             mLastMagnetometerSet = true;
         }
         if (mLastAccelerometerSet && mLastMagnetometerSet) {
@@ -277,14 +291,13 @@ public class MainActivity extends Activity implements
             direction = -azimuthInDegress;
 //            Log.d("SensorChange", "" + direction);
             float delta = (direction - olddirection);
-            for (LittleArrow a : arrows) {
-                a.rotate(delta);
-            }
+
 //            if (bigarrow != null) {
 //                bigarrow.setRotation((bigarrow.getRotation()+delta)%360);
 //            }
-            for (Locals l : this.locations) {
-                l.setDegrees((l.getDegrees() + delta)%360);
+            for (int n = 0; n < this.locations.size(); n++) {
+                this.locations.get(n).setDegrees((this.locations.get(n).getDegrees() + delta)%360);
+                arrows.get(n).setRotate(this.locations.get(n).getDegrees());
             }
         }
 
