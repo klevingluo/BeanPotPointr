@@ -169,7 +169,8 @@ public class MainActivity extends Activity implements
             if (event.getType() == DataEvent.TYPE_CHANGED) {
                 // DataItem changed
                 DataItem item = event.getDataItem();
-                if (item.getUri().getPath().compareTo("/data") == 0) {
+                if (item.getUri().getPath().compareTo("/places") == 0) {
+                    Log.d("Watch", "Data changed!");
                     DataMap dataMap = DataMapItem.fromDataItem(item).getDataMap();
                     ArrayList<String> locations = dataMap.getStringArrayList("com.oscode.pointr.key.data");
                     this.locations = importData(locations);
@@ -260,7 +261,7 @@ public class MainActivity extends Activity implements
             float olddirection;
             olddirection = direction;
             direction = -azimuthInDegress;
-            Log.d("SensorChange", "" + direction);
+//            Log.d("SensorChange", "" + direction);
             float delta = (direction - olddirection);
             for (LittleArrow a : arrows) {
                 a.rotate(delta);
@@ -274,7 +275,7 @@ public class MainActivity extends Activity implements
         }
 
         if (this.locations != null) {
-            
+
         }
 //        direction = (float) (event.values[0]);
 

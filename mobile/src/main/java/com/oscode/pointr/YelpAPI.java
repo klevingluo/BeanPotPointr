@@ -12,6 +12,8 @@ import org.scribe.model.Token;
 import org.scribe.model.Verb;
 import org.scribe.oauth.OAuthService;
 
+import java.util.ArrayList;
+
 /**
  * Code sample for accessing the Yelp API V2.
  *
@@ -159,5 +161,23 @@ public class YelpAPI extends AsyncTask<Void, Void, Void>{
     @Override
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
+        try {
+            JSONProcessor.data = JSONProcessor.yelpAPI.getData().getJSONArray("businesses");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        JSONProcessor.locations = new ArrayList<Locals>();
+        for (int i = 0; i < JSONProcessor.data.length(); i++) {
+            try {
+                JSONObject temp = JSONProcessor.data.getJSONObject(i);
+                if (!temp.getBoolean("is_closed")) {
+                    Locals l = new Locals(temp);
+                    JSONProcessor.locations.add(l);
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        MainActivity.sendData();
     }
 }
