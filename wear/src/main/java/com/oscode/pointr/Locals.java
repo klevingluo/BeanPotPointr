@@ -27,6 +27,14 @@ public class Locals {
         }
     }
 
+    public Locals(String name, double rating, double latitude, double longitude, String description) {
+        this.name = name;
+        this.rating = rating;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.description = description;
+    }
+
     public void updateDistance(double myLat, double myLong) {
         double deltLat = latitude - myLat;
         double deltLong = longitude - myLong;

@@ -151,12 +151,23 @@ public class MainActivity extends Activity implements
                 if (item.getUri().getPath().compareTo("/data") == 0) {
                     DataMap dataMap = DataMapItem.fromDataItem(item).getDataMap();
                     ArrayList<String> locations = dataMap.getStringArrayList("com.oscode.pointr.key.data");
+                    this.locations = importData(locations);
                 }
 
             } else if (event.getType() == DataEvent.TYPE_DELETED) {
                 // DataItem deleted
             }
         }
+    }
+
+    private ArrayList<Locals> importData(ArrayList<String> dat){
+        ArrayList<Locals> ret = new ArrayList<Locals>();
+        for(String s : dat){
+            String[] s2 = s.split("\t");
+            Locals l = new Locals(s2[0], Double.parseDouble(s2[1]), Double.parseDouble(s2[2]),Double.parseDouble(s2[3]), s2[4]);
+            ret.add(l);
+        }
+        return ret;
     }
 
     class LittleArrow extends ImageView {
@@ -314,7 +325,7 @@ public class MainActivity extends Activity implements
 
     private void sendLocation() {
         ArrayList<String> latlong = new ArrayList<String>();
-        latlong.add(mLastLocation.getLatitude()+"");
+        latlong.add(mLastLocation.getLatitude() + "");
         latlong.add(mLastLocation.getLongitude()+"");
         PutDataMapRequest putDataMapReq = PutDataMapRequest.create("/location");
         putDataMapReq.getDataMap().putStringArrayList("com.oscode.pointr.key.location", latlong);
