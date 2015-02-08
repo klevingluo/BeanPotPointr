@@ -306,7 +306,7 @@ public class MainActivity extends Activity implements
 //            if (bigarrow != null) {
 //                bigarrow.setRotation((bigarrow.getRotation()+delta)%360);
 //            }
-            if (linearLayout.getMeasuredHeight() <= (scrollView.getScrollY() + scrollView.getHeight())) {
+            if (scrollView.getScrollY() == 0) {
                 for (int n = 0; n < this.locations.size(); n++) {
 //                if (delta > 3)
                     this.locations.get(n).setDegrees((this.locations.get(n).getDegrees() + delta) % 360);
