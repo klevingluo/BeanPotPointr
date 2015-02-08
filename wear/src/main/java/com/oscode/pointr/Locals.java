@@ -71,6 +71,7 @@ public class Locals {
         distance = d;
         degrees = (float) ((deltLong < 0 ? Math.atan(deltLat/deltLong) : Math.PI + Math.atan(deltLat/deltLong))%(2*Math.PI));
         degrees *= 180/Math.PI;
+
     }
 
     public float getDegrees() {
