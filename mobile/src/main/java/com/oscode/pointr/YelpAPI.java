@@ -30,7 +30,7 @@ public class YelpAPI extends AsyncTask<Void, Void, Void>{
     private static final String API_HOST = "api.yelp.com";
     private static final String SEARCH_PATH = "/v2/search";
     private static final String BUSINESS_PATH = "/v2/business";
-    private static final int SEARCH_LIMIT = 19;
+    private static final int SEARCH_LIMIT = 10;
     private static final int SORT_TYPE = 1;
     private String term = "food";
     private String longitude;
