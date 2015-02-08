@@ -26,13 +26,13 @@ public class MainActivity extends ActionBarActivity implements
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
 
-    private GoogleApiClient mGoogleApiClient;
+    private static GoogleApiClient mGoogleApiClient;
+    JSONProcessor jsonProcessor = new JSONProcessor();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        ArrayList<Locals> test = JSONProcessor.getLocations();
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addApi(Wearable.API)
@@ -65,10 +65,10 @@ public class MainActivity extends ActionBarActivity implements
     }
 
 
-    private void sendData() {
+    public static void sendData() {
         PutDataMapRequest putDataMapReq = PutDataMapRequest.create("/data");
         ArrayList<String> toSend = JSONProcessor.exportLocations();
-        putDataMapReq.getDataMap().putStringArrayList("com.oscode.pointr.key.stuff", toSend);
+        putDataMapReq.getDataMap().putStringArrayList("com.oscode.pointr.key.data", toSend);
         PutDataRequest putDataReq = putDataMapReq.asPutDataRequest();
         PendingResult<DataApi.DataItemResult> pendingResult =
                 Wearable.DataApi.putDataItem(mGoogleApiClient, putDataReq);
@@ -104,9 +104,14 @@ public class MainActivity extends ActionBarActivity implements
             if (event.getType() == DataEvent.TYPE_CHANGED) {
                 // DataItem changed
                 DataItem item = event.getDataItem();
-                if (item.getUri().getPath().compareTo("/count") == 0) {
+                if (item.getUri().getPath().compareTo("/data") == 0) {
                     DataMap dataMap = DataMapItem.fromDataItem(item).getDataMap();
-                    dataMap.getInt("key");
+                    // TODO
+                }
+                if (item.getUri().getPath().compareTo("/location") == 0) {
+                    DataMap dataMap = DataMapItem.fromDataItem(item).getDataMap();
+                    ArrayList<String> location = dataMap.getStringArrayList("com.oscode.pointr.key.location");
+                    jsonProcessor.update(location.get(0), location.get(1));
                 }
             } else if (event.getType() == DataEvent.TYPE_DELETED) {
                 // DataItem deleted

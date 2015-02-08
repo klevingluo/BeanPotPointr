@@ -23,11 +23,20 @@ import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.Result;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.wearable.DataApi;
+import com.google.android.gms.wearable.DataEvent;
+import com.google.android.gms.wearable.DataEventBuffer;
+import com.google.android.gms.wearable.DataItem;
+import com.google.android.gms.wearable.DataMap;
+import com.google.android.gms.wearable.DataMapItem;
+import com.google.android.gms.wearable.PutDataMapRequest;
+import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
 
 import java.util.ArrayList;
@@ -36,7 +45,8 @@ public class MainActivity extends Activity implements
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
         LocationListener,
-        SensorEventListener {
+        SensorEventListener,
+        DataApi.DataListener {
 
     private TextView mTextView;
 
@@ -46,6 +56,7 @@ public class MainActivity extends Activity implements
     Animation animation;
     private GoogleApiClient mGoogleApiClient;
     Location mLastLocation;
+    ArrayList<Locals> locations = new ArrayList<Locals>();
 
     /**
      * variables for compass sensing
@@ -130,6 +141,24 @@ public class MainActivity extends Activity implements
     void makeLittleArrow(int degree) {
 
     }
+
+    @Override
+    public void onDataChanged(DataEventBuffer dataEvents) {
+        for (DataEvent event : dataEvents) {
+            if (event.getType() == DataEvent.TYPE_CHANGED) {
+                // DataItem changed
+                DataItem item = event.getDataItem();
+                if (item.getUri().getPath().compareTo("/data") == 0) {
+                    DataMap dataMap = DataMapItem.fromDataItem(item).getDataMap();
+                    ArrayList<String> locations = dataMap.getStringArrayList("com.oscode.pointr.key.data");
+                }
+
+            } else if (event.getType() == DataEvent.TYPE_DELETED) {
+                // DataItem deleted
+            }
+        }
+    }
+
     class LittleArrow extends ImageView {
 
         public float getDegree() {
@@ -226,7 +255,7 @@ public class MainActivity extends Activity implements
         else {
             Log.d("OUR GPS", "Location: null");
         }
-
+        sendLocation();
     }
 
     @Override
@@ -281,5 +310,16 @@ public class MainActivity extends Activity implements
     protected void onStart() {
         super.onStart();
         mGoogleApiClient.connect();
+    }
+
+    private void sendLocation() {
+        ArrayList<String> latlong = new ArrayList<String>();
+        latlong.add(mLastLocation.getLatitude()+"");
+        latlong.add(mLastLocation.getLongitude()+"");
+        PutDataMapRequest putDataMapReq = PutDataMapRequest.create("/location");
+        putDataMapReq.getDataMap().putStringArrayList("com.oscode.pointr.key.location", latlong);
+        PutDataRequest putDataReq = putDataMapReq.asPutDataRequest();
+        PendingResult<DataApi.DataItemResult> pendingResult =
+                Wearable.DataApi.putDataItem(mGoogleApiClient, putDataReq);
     }
 }

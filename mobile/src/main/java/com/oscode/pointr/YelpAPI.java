@@ -63,7 +63,7 @@ public class YelpAPI extends AsyncTask<Void, Void, Void>{
         this.accessToken = new Token(token, tokenSecret);
     }
 
-    public YelpAPI() {
+    public YelpAPI(String latitude, String longitude) {
         this.service =
                 new ServiceBuilder().provider(TwoStepOAuth.class).apiKey(CONSUMER_KEY)
                         .apiSecret(CONSUMER_SECRET).build();
@@ -159,6 +159,7 @@ public class YelpAPI extends AsyncTask<Void, Void, Void>{
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
         this.isUpdated = true;
+        MainActivity.sendData();
     }
 
     public JSONObject getData() {

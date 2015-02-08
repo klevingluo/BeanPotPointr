@@ -20,16 +20,11 @@ public class JSONProcessor {
         return ret;
     }
 
-    public static ArrayList<Locals> getLocations() {
-        update(false);
-        return locations;
-    }
-
-    public static void update(boolean redownload) {//TODO: note, have YelpHandler check message code and pass in only JSONARRAY
+    public static void update(String latitude, String longitude) {//TODO: note, have YelpHandler check message code and pass in only JSONARRAY
         if (yelpAPI == null) {
-            yelpAPI = new YelpAPI();
+            yelpAPI = new YelpAPI(latitude, longitude);
         }
-        if (redownload || locations == null) {
+        if (locations == null) {
             JSONArray data = null;
             try {
                 yelpAPI.execute();
