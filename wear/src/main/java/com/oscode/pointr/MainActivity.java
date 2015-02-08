@@ -179,7 +179,7 @@ public class MainActivity extends Activity implements
                         @Override
                         public void run() {
                             name.setText(front.getName());
-                            distance.setText((int)front.getDistance() + "m");
+                            distance.setText(front.getDistance() + "m");
                             ratingBar.setRating(front.getRating());
                             bigarrow.setRotation(front.getDegrees());
                         }
