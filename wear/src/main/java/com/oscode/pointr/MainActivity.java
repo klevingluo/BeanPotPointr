@@ -115,7 +115,7 @@ public class MainActivity extends Activity implements
                 stars = (LayerDrawable) ratingBar.getProgressDrawable();
                 stars.getDrawable(2).setColorFilter(Color.rgb(0x2d, 0x9c, 0x93), PorterDuff.Mode.SRC_ATOP);
                 bigarrow = (ImageView) findViewById(R.id.big_arrow);
-                bigarrow.setVisibility(View.INVISIBLE);
+//                bigarrow.setVisibility(View.INVISIBLE);
                 name = (TextView) findViewById(R.id.place_name);
                 distance = (TextView) findViewById(R.id.distance);
 //                animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.rotate);
@@ -175,6 +175,7 @@ public class MainActivity extends Activity implements
                     ArrayList<String> locations = dataMap.getStringArrayList("com.oscode.pointr.key.data");
                     this.locations = importData(locations);
                     final Locals front = maxLocal(this.locations);
+                    final ArrayList<Locals>locs2 = this.locations;
                     Log.d("CLOSEST LOCAL", front.getName()+front.getDistance()+front.getRating()+front.getDegrees());
                     runOnUiThread(new Runnable() {
                         @Override
@@ -183,16 +184,18 @@ public class MainActivity extends Activity implements
                             distance.setText(front.getDistance() + "m");
                             ratingBar.setRating(front.getRating());
                             bigarrow.setRotation(front.getDegrees());
+                            for (Locals l : locs2) {
+                                arrows.add(new LittleArrow(getApplicationContext(), l.getDegrees() + direction));
+                            }
+                            for (LittleArrow l : arrows) {
+                                relativeLayout.addView(l);
+                            }
                         }
                     });
 
-                    for (Locals l : this.locations) {
-                        arrows.add(new LittleArrow(getApplicationContext(), l.getDegrees() + direction));
-                    }
-                    for (LittleArrow l : arrows) {
-                        relativeLayout.addView(l);
-                    }
+
                     relativeLayout.invalidate();
+                    Log.d("Total number of arrows", arrows.size()+"");
                 }
 
             } else if (event.getType() == DataEvent.TYPE_DELETED) {
