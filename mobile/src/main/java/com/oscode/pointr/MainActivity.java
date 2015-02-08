@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -27,7 +28,8 @@ public class MainActivity extends ActionBarActivity implements
         GoogleApiClient.OnConnectionFailedListener {
 
     private static GoogleApiClient mGoogleApiClient;
-    JSONProcessor jsonProcessor = new JSONProcessor();
+    static JSONProcessor jsonProcessor = new JSONProcessor();
+    static TextView db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +41,8 @@ public class MainActivity extends ActionBarActivity implements
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .build();
+        db = (TextView) findViewById(R.id.debug);
+        db.setText("App created!");
     }
 
 
@@ -65,13 +69,14 @@ public class MainActivity extends ActionBarActivity implements
     }
 
 
-    public static void sendData() {
+    private static void sendData() {
         PutDataMapRequest putDataMapReq = PutDataMapRequest.create("/data");
-        ArrayList<String> toSend = JSONProcessor.exportLocations();
+        ArrayList<String> toSend = jsonProcessor.exportLocations();
         putDataMapReq.getDataMap().putStringArrayList("com.oscode.pointr.key.data", toSend);
         PutDataRequest putDataReq = putDataMapReq.asPutDataRequest();
         PendingResult<DataApi.DataItemResult> pendingResult =
                 Wearable.DataApi.putDataItem(mGoogleApiClient, putDataReq);
+        db.setText(db.getText()+ "\nData sent to watch!" );
     }
 
     @Override
@@ -91,6 +96,7 @@ public class MainActivity extends ActionBarActivity implements
     @Override
     public void onConnected(Bundle bundle) {
         Wearable.DataApi.addListener(mGoogleApiClient, this);
+        db.setText(db.getText()+"\nGoogle API connected!");
     }
 
     @Override
@@ -112,6 +118,16 @@ public class MainActivity extends ActionBarActivity implements
                     DataMap dataMap = DataMapItem.fromDataItem(item).getDataMap();
                     ArrayList<String> location = dataMap.getStringArrayList("com.oscode.pointr.key.location");
                     jsonProcessor.update(location.get(0), location.get(1));
+
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+
+                            db.setText(db.getText()+"\nLocation recieved from watch!");
+
+                        }
+                    });
+
                 }
             } else if (event.getType() == DataEvent.TYPE_DELETED) {
                 // DataItem deleted
@@ -121,6 +137,6 @@ public class MainActivity extends ActionBarActivity implements
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
-
+        db.setText(db.getText()+"\nConnection failed!");
     }
 }

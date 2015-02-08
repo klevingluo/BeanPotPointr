@@ -40,6 +40,7 @@ import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 
 public class MainActivity extends Activity implements
         GoogleApiClient.ConnectionCallbacks,
@@ -76,6 +77,24 @@ public class MainActivity extends Activity implements
     private double longitude;
     private float direction = 0;
     ArrayList<LittleArrow> arrows = new ArrayList<LittleArrow>();
+    TextView name;
+    TextView distance;
+
+
+    class LocalsComparator implements Comparator<Locals>{
+
+        @Override
+        public int compare(Locals lhs, Locals rhs) {
+            float lhsd = lhs.getDegrees();
+            float rhsd = rhs.getDegrees();
+            if (lhsd == rhsd) return 0;
+            lhsd = Math.abs(Math.abs(lhsd) - 180);
+            rhsd = Math.abs(Math.abs(rhsd) - 180);
+            if (lhsd > rhsd) return 1;
+            else return -1;
+
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,39 +116,41 @@ public class MainActivity extends Activity implements
                 stars = (LayerDrawable) ratingBar.getProgressDrawable();
                 stars.getDrawable(2).setColorFilter(Color.rgb(0x2d, 0x9c, 0x93), PorterDuff.Mode.SRC_ATOP);
                 bigarrow = (ImageView) findViewById(R.id.big_arrow);
+                name = (TextView) findViewById(R.id.place_name);
+                distance = (TextView) findViewById(R.id.distance);
 //                animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.rotate);
 //                bigarrow.startAnimation(animation);
                 final RelativeLayout relativeLayout = (RelativeLayout) findViewById(R.id.relLayout);
-                Handler handler = new Handler();
-                handler.postDelayed(new Runnable(){
-                    @Override
-                    public void run() {
-                        arrows.add(new LittleArrow(getApplicationContext(), 35));
-                        relativeLayout.addView(arrows.get(0));
-                    }
-                }, 2000);
-                handler.postDelayed(new Runnable(){
-                    @Override
-                    public void run() {
-                        arrows.add(new LittleArrow(getApplicationContext(), 90));
-                        relativeLayout.addView(arrows.get(1));
-                    }
-                }, 3000);
-                handler.postDelayed(new Runnable(){
-                    @Override
-                    public void run() {
-                        arrows.add(new LittleArrow(getApplicationContext(), 270));
-                        relativeLayout.addView(arrows.get(2));
-                    }
-                }, 4000);
-                handler.postDelayed(new Runnable(){
-                    @Override
-                    public void run() {
-                        arrows.add(new LittleArrow(getApplicationContext(), 300));
-                        relativeLayout.addView(arrows.get(3));
-                        Log.d("Pointr", "last point loaded");
-                    }
-                }, 5000);
+//                Handler handler = new Handler();
+//                handler.postDelayed(new Runnable(){
+//                    @Override
+//                    public void run() {
+//                        arrows.add(new LittleArrow(getApplicationContext(), 35));
+//                        relativeLayout.addView(arrows.get(0));
+//                    }
+//                }, 2000);
+//                handler.postDelayed(new Runnable(){
+//                    @Override
+//                    public void run() {
+//                        arrows.add(new LittleArrow(getApplicationContext(), 90));
+//                        relativeLayout.addView(arrows.get(1));
+//                    }
+//                }, 3000);
+//                handler.postDelayed(new Runnable(){
+//                    @Override
+//                    public void run() {
+//                        arrows.add(new LittleArrow(getApplicationContext(), 270));
+//                        relativeLayout.addView(arrows.get(2));
+//                    }
+//                }, 4000);
+//                handler.postDelayed(new Runnable(){
+//                    @Override
+//                    public void run() {
+//                        arrows.add(new LittleArrow(getApplicationContext(), 300));
+//                        relativeLayout.addView(arrows.get(3));
+//                        Log.d("Pointr", "last point loaded");
+//                    }
+//                }, 5000);
 
             }
         });
@@ -152,6 +173,11 @@ public class MainActivity extends Activity implements
                     DataMap dataMap = DataMapItem.fromDataItem(item).getDataMap();
                     ArrayList<String> locations = dataMap.getStringArrayList("com.oscode.pointr.key.data");
                     this.locations = importData(locations);
+                    Locals front = maxLocal(this.locations);
+                    name.setText(front.getName());
+                    distance.setText(front.getDistance() + "");
+                    ratingBar.setRating(front.getRating());
+                    bigarrow.setRotation(front.getDegrees());
                 }
 
             } else if (event.getType() == DataEvent.TYPE_DELETED) {
@@ -160,11 +186,25 @@ public class MainActivity extends Activity implements
         }
     }
 
+    public Locals maxLocal(ArrayList<Locals> locs) {
+        int index = 0;
+        LocalsComparator c = new LocalsComparator();
+        for (int n = 0; n < locs.size(); n++) {
+            Locals l = locs.get(n);
+            if (c.compare(locs.get(index), locs.get(n)) < 0)
+            {
+                index = n;
+            }
+        }
+        return locs.get(index);
+    }
+
     private ArrayList<Locals> importData(ArrayList<String> dat){
         ArrayList<Locals> ret = new ArrayList<Locals>();
         for(String s : dat){
             String[] s2 = s.split("\t");
-            Locals l = new Locals(s2[0], Double.parseDouble(s2[1]), Double.parseDouble(s2[2]),Double.parseDouble(s2[3]), s2[4]);
+            Locals l = new Locals(s2[0], (float)Double.parseDouble(s2[1]), Double.parseDouble(s2[2]),Double.parseDouble(s2[3]), s2[4]);
+            l.updateDistance(mLastLocation.getLatitude(), mLastLocation.getLongitude());
             ret.add(l);
         }
         return ret;
