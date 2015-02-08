@@ -73,4 +73,9 @@ public class Locals {
     public void setDegrees(float degrees) {
         this.degrees = degrees;
     }
+
+    @Override
+    public String toString() {
+        return name + "\n" + rating + "\n" + distance + "\n" + latitude + "\n" + longitude + "\n" + description + "\n" + degrees;
+    }
 }
