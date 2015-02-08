@@ -280,7 +280,7 @@ public class MainActivity extends Activity implements
             }
         }
 
-        if (this.locations != null) {
+        if (this.locations.size() != 0) {
             final Locals front = maxLocal(this.locations);
             Log.d("CLOSEST LOCAL", front.getName()+front.getDistance()+front.getRating()+front.getDegrees());
             runOnUiThread(new Runnable() {
