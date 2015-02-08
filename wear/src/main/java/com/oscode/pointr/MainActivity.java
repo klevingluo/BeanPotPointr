@@ -280,9 +280,9 @@ public class MainActivity extends Activity implements
             for (LittleArrow a : arrows) {
                 a.rotate(delta);
             }
-            if (bigarrow != null) {
-                bigarrow.setRotation((bigarrow.getRotation()+delta)%360);
-            }
+//            if (bigarrow != null) {
+//                bigarrow.setRotation((bigarrow.getRotation()+delta)%360);
+//            }
             for (Locals l : this.locations) {
                 l.setDegrees((l.getDegrees() + delta)%360);
             }
