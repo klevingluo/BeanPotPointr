@@ -10,6 +10,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.wearable.view.WatchViewStub;
 import android.util.Log;
@@ -17,8 +18,10 @@ import android.view.View;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RatingBar;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -50,7 +53,7 @@ public class MainActivity extends Activity implements
         DataApi.DataListener {
 
     private TextView mTextView;
-    static final float ALPHA = 0.25f;
+    static final float ALPHA = 0.75f;
 
     RatingBar ratingBar;
     LayerDrawable stars;
@@ -59,6 +62,7 @@ public class MainActivity extends Activity implements
     private GoogleApiClient mGoogleApiClient;
     Location mLastLocation;
     ArrayList<Locals> locations = new ArrayList<Locals>();
+    ScrollView scrollView;
 
     /**
      * variables for compass sensing
@@ -80,7 +84,9 @@ public class MainActivity extends Activity implements
     ArrayList<LittleArrow> arrows = new ArrayList<LittleArrow>();
     TextView name;
     TextView distance;
+    TextView description;
     RelativeLayout relativeLayout;
+    LinearLayout linearLayout;
 
     class LocalsComparator implements Comparator<Locals>{
 
@@ -119,9 +125,12 @@ public class MainActivity extends Activity implements
 //                bigarrow.setVisibility(View.INVISIBLE);
                 name = (TextView) findViewById(R.id.place_name);
                 distance = (TextView) findViewById(R.id.distance);
+                description = (TextView) findViewById(R.id.description);
 //                animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.rotate);
 //                bigarrow.startAnimation(animation);
                 relativeLayout = (RelativeLayout) findViewById(R.id.relLayout);
+                scrollView = (ScrollView) findViewById(R.id.scrollView);
+                linearLayout = (LinearLayout) findViewById(R.id.linlayout);
 //                Handler handler = new Handler();
 //                handler.postDelayed(new Runnable(){
 //                    @Override
@@ -184,6 +193,7 @@ public class MainActivity extends Activity implements
                             name.setText(front.getName());
                             distance.setText(front.getDistance() + "m");
                             ratingBar.setRating(front.getRating());
+                            description.setText(front.getDescription());
                             bigarrow.setRotation(front.getDegrees());
                             for (Locals l : locs2) {
                                 arrows.add(new LittleArrow(getApplicationContext(), l.getDegrees() + direction));
@@ -195,8 +205,10 @@ public class MainActivity extends Activity implements
                     });
 
 
-                    relativeLayout.invalidate();
+//                    relativeLayout.invalidate();
                     Log.d("Total number of arrows", arrows.size()+"");
+
+                    Wearable.DataApi.deleteDataItems(mGoogleApiClient, item.getUri());
                 }
 
             } else if (event.getType() == DataEvent.TYPE_DELETED) {
@@ -295,15 +307,18 @@ public class MainActivity extends Activity implements
 //            if (bigarrow != null) {
 //                bigarrow.setRotation((bigarrow.getRotation()+delta)%360);
 //            }
-            for (int n = 0; n < this.locations.size(); n++) {
-                this.locations.get(n).setDegrees((this.locations.get(n).getDegrees() + delta)%360);
-                arrows.get(n).setRotate(this.locations.get(n).getDegrees());
+            if (linearLayout.getMeasuredHeight() <= (scrollView.getScrollY() + scrollView.getHeight())) {
+                for (int n = 0; n < this.locations.size(); n++) {
+//                if (delta > 3)
+                    this.locations.get(n).setDegrees((this.locations.get(n).getDegrees() + delta) % 360);
+                    arrows.get(n).setRotate(this.locations.get(n).getDegrees());
+                }
             }
         }
 
         if (this.locations.size() != 0) {
             final Locals front = maxLocal(this.locations);
-            Log.d("CLOSEST LOCAL", front.getName()+front.getDistance()+front.getRating()+front.getDegrees());
+//            Log.d("CLOSEST LOCAL", front.getName()+front.getDistance()+front.getRating()+front.getDegrees());
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -311,6 +326,7 @@ public class MainActivity extends Activity implements
                     distance.setText((int)front.getDistance() + "m");
                     ratingBar.setRating(front.getRating());
                     bigarrow.setRotation(front.getDegrees());
+                    description.setText(front.getDescription());
                 }
             });
         }
