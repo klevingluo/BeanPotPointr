@@ -375,6 +375,9 @@ public class MainActivity extends Activity implements
     @Override
     public void onLocationChanged(Location location) {
         Log.d("OUR GPS", "Location: " + location.getLatitude() + ", " + location.getLongitude());
+        for(Locals l : locations){
+            l.updateDistance(location.getLatitude(), location.getLongitude());
+        }
     }
 
 
