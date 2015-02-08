@@ -169,7 +169,7 @@ public class YelpAPI extends AsyncTask<Void, Void, Void>{
             e.printStackTrace();
         }
         JSONProcessor.locations = new ArrayList<Locals>();
-        for (int i = 0; i < JSONProcessor.data.length(); i++) {
+        for (int i = 0; i < 10; i++) {//<---- change back to JSONProcessor.data.length() instead of 10 if you want more results
             try {
                 JSONObject temp = JSONProcessor.data.getJSONObject(i);
                 if (!temp.getBoolean("is_closed")) {
