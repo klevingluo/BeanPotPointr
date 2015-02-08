@@ -31,6 +31,6 @@ public class Locals {
         double deltLat = latitude - myLat;
         double deltLong = longitude - myLong;
         distance = Math.sqrt(deltLat*deltLat + deltLong*deltLong);
-        degrees = (deltLong > 0 ? Math.atan(deltLat/deltLong) : Math.PI - Math.atan(deltLat/deltLong))%(2*Math.PI);
+        degrees = (deltLong > 0 ? Math.atan(deltLat/deltLong) : Math.PI + Math.atan(deltLat/deltLong))%(2*Math.PI);
     }
 }
