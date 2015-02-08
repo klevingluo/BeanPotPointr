@@ -178,6 +178,9 @@ public class MainActivity extends Activity implements
                     distance.setText(front.getDistance() + "");
                     ratingBar.setRating(front.getRating());
                     bigarrow.setRotation(front.getDegrees());
+                    for (Locals l : this.locations) {
+                        arrows.add(new LittleArrow(getApplicationContext(), l.getDegrees()));
+                    }
                 }
 
             } else if (event.getType() == DataEvent.TYPE_DELETED) {
@@ -265,9 +268,14 @@ public class MainActivity extends Activity implements
             if (bigarrow != null) {
                 bigarrow.setRotation((bigarrow.getRotation()+delta)%360);
             }
+            for (Locals l : this.locations) {
+                l.setDegrees((l.getDegrees() + delta)%360);
+            }
         }
 
-
+        if (this.locations != null) {
+            
+        }
 //        direction = (float) (event.values[0]);
 
 

@@ -69,7 +69,7 @@ public class MainActivity extends ActionBarActivity implements
     }
 
 
-    private static void sendData() {
+    public static void sendData() {
         PutDataMapRequest putDataMapReq = PutDataMapRequest.create("/data");
         ArrayList<String> toSend = jsonProcessor.exportLocations();
         putDataMapReq.getDataMap().putStringArrayList("com.oscode.pointr.key.data", toSend);
