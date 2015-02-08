@@ -67,7 +67,7 @@ public class Locals {
         double deltLong = Math.toRadians(longitude - myLong);
         double a = (Math.sin(deltLat / 2) * Math.sin(deltLat / 2)) + (Math.cos(lat1) * Math.cos(lat2) * Math.sin(deltLong / 2) * Math.sin(deltLong / 2));
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        double d = R * c * 0.62137;//in miles
+        double d = R * c;
         distance = d;
         degrees = (float) ((deltLong < 0 ? Math.atan(deltLat/deltLong) : Math.PI + Math.atan(deltLat/deltLong))%(2*Math.PI));
         degrees *= 180/Math.PI;
