@@ -11,7 +11,6 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.location.Location;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.wearable.view.WatchViewStub;
 import android.util.Log;
 import android.view.WindowManager;
@@ -186,7 +185,7 @@ public class MainActivity extends Activity implements
                     });
 
                     for (Locals l : this.locations) {
-                        arrows.add(new LittleArrow(getApplicationContext(), l.getDegrees()));
+                        arrows.add(new LittleArrow(getApplicationContext(), l.getDegrees() + direction));
                     }
                 }
 
