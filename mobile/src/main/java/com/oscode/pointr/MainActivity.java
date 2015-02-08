@@ -20,6 +20,7 @@ import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 
 public class MainActivity extends ActionBarActivity implements
@@ -73,6 +74,8 @@ public class MainActivity extends ActionBarActivity implements
         PutDataMapRequest putDataMapReq = PutDataMapRequest.create("/places");
         ArrayList<String> toSend = jsonProcessor.exportLocations();
         putDataMapReq.getDataMap().putStringArrayList("com.oscode.pointr.key.data", toSend);
+        Calendar c = Calendar.getInstance();
+        putDataMapReq.getDataMap().putInt("com.oscode.pointr.key.time", c.get(Calendar.SECOND));
         PutDataRequest putDataReq = putDataMapReq.asPutDataRequest();
         PendingResult<DataApi.DataItemResult> pendingResult =
                 Wearable.DataApi.putDataItem(mGoogleApiClient, putDataReq);

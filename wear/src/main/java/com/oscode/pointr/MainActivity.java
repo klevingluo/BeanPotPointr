@@ -42,6 +42,7 @@ import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Comparator;
 
 public class MainActivity extends Activity implements
@@ -207,7 +208,7 @@ public class MainActivity extends Activity implements
 //                    relativeLayout.invalidate();
                     Log.d("Total number of arrows", arrows.size()+"");
 
-                    Wearable.DataApi.deleteDataItems(mGoogleApiClient, item.getUri());
+//                    Wearable.DataApi.deleteDataItems(mGoogleApiClient, item.getUri());
                 }
 
             } else if (event.getType() == DataEvent.TYPE_DELETED) {
@@ -284,9 +285,9 @@ public class MainActivity extends Activity implements
     @Override
     public void onSensorChanged(SensorEvent event) {
         if (event.sensor == mAccelerometer) {
-            System.arraycopy(event.values, 0, mLastAccelerometer, 0, event.values.length);
-            mLastAccelerometer = lowPass(mLastAccelerometer.clone(), mLastAccelerometer);
-            mLastAccelerometerSet = true;
+//            System.arraycopy(event.values, 0, mLastAccelerometer, 0, event.values.length);
+//            mLastAccelerometer = lowPass(mLastAccelerometer.clone(), mLastAccelerometer);
+//            mLastAccelerometerSet = true;
         } else if (event.sensor == mMagnetometer) {
             System.arraycopy(event.values, 0, mLastMagnetometer, 0, event.values.length);
             mLastMagnetometer = lowPass(mLastMagnetometer.clone(), mLastMagnetometer);
@@ -294,8 +295,10 @@ public class MainActivity extends Activity implements
         }
         if (mLastAccelerometerSet && mLastMagnetometerSet) {
             SensorManager.getRotationMatrix(mR, null, mLastAccelerometer, mLastMagnetometer);
+//            SensorManager.getRotationMatrix(mR, null, mLastAccelerometer, null);
             SensorManager.getOrientation(mR, mOrientation);
             float azimuthInRadians = mOrientation[0];
+//            float azimuthInRadians = mLastAccelerometer[2];
             float azimuthInDegress = (float)(Math.toDegrees(azimuthInRadians)+360)%360;
             float olddirection;
             olddirection = direction;
@@ -437,6 +440,8 @@ public class MainActivity extends Activity implements
         latlong.add(mLastLocation.getLongitude()+"");
         PutDataMapRequest putDataMapReq = PutDataMapRequest.create("/location");
         putDataMapReq.getDataMap().putStringArrayList("com.oscode.pointr.key.location", latlong);
+        Calendar c = Calendar.getInstance();
+        putDataMapReq.getDataMap().putInt("com.oscode.pointr.key.time", c.get(Calendar.SECOND));
         PutDataRequest putDataReq = putDataMapReq.asPutDataRequest();
         PendingResult<DataApi.DataItemResult> pendingResult =
                 Wearable.DataApi.putDataItem(mGoogleApiClient, putDataReq);
