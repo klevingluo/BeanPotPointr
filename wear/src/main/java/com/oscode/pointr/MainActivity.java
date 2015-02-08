@@ -179,7 +179,7 @@ public class MainActivity extends Activity implements
                         @Override
                         public void run() {
                             name.setText(front.getName());
-                            distance.setText(front.getDistance() + "");
+                            distance.setText((int)front.getDistance() + "m");
                             ratingBar.setRating(front.getRating());
                             bigarrow.setRotation(front.getDegrees());
                         }
@@ -281,7 +281,17 @@ public class MainActivity extends Activity implements
         }
 
         if (this.locations != null) {
-
+            final Locals front = maxLocal(this.locations);
+            Log.d("CLOSEST LOCAL", front.getName()+front.getDistance()+front.getRating()+front.getDegrees());
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    name.setText(front.getName());
+                    distance.setText((int)front.getDistance() + "m");
+                    ratingBar.setRating(front.getRating());
+                    bigarrow.setRotation(front.getDegrees());
+                }
+            });
         }
 //        direction = (float) (event.values[0]);
 
