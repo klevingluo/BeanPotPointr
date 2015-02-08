@@ -1,10 +1,6 @@
 package com.oscode.pointr;
 
-import android.util.Log;
-
 import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 
@@ -12,9 +8,10 @@ public class JSONProcessor {
     public static ArrayList<Locals> locations;
     public static YelpAPI yelpAPI;
     public static JSONArray data;
-    public static ArrayList<String> exportLocations(){
+
+    public static ArrayList<String> exportLocations() {
         ArrayList<String> ret = new ArrayList<String>();
-        for(Locals l : locations){
+        for (Locals l : locations) {
             ret.add(l.toString());
         }
         return ret;
