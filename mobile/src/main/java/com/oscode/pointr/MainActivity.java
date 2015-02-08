@@ -66,8 +66,9 @@ public class MainActivity extends ActionBarActivity implements
 
 
     private void sendData() {
-        PutDataMapRequest putDataMapReq = PutDataMapRequest.create("/count");
-        putDataMapReq.getDataMap().putInt("key", 0x3);
+        PutDataMapRequest putDataMapReq = PutDataMapRequest.create("/data");
+        ArrayList<String> toSend = JSONProcessor.exportLocations();
+        putDataMapReq.getDataMap().putStringArrayList("com.oscode.pointr.key.stuff", toSend);
         PutDataRequest putDataReq = putDataMapReq.asPutDataRequest();
         PendingResult<DataApi.DataItemResult> pendingResult =
                 Wearable.DataApi.putDataItem(mGoogleApiClient, putDataReq);

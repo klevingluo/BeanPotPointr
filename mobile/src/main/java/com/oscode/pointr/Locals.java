@@ -6,7 +6,6 @@ import org.json.JSONObject;
 public class Locals {
     private String name;
     private double rating;
-    private double distance;
     private double latitude;
     private double longitude;
     private String description;
@@ -21,5 +20,10 @@ public class Locals {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public String toString() {
+        return name + "\t" + rating + "\t" + latitude + "\t" + longitude + "\t" + description;
     }
 }

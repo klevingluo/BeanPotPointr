@@ -12,6 +12,14 @@ public class JSONProcessor {
     private static ArrayList<Locals> locations;
     private static YelpAPI yelpAPI;
 
+    public static ArrayList<String> exportLocations(){
+        ArrayList<String> ret = new ArrayList<String>();
+        for(Locals l : locations){
+            ret.add(l.toString());
+        }
+        return ret;
+    }
+
     public static ArrayList<Locals> getLocations() {
         update(false);
         return locations;
