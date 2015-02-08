@@ -173,12 +173,18 @@ public class MainActivity extends Activity implements
                     DataMap dataMap = DataMapItem.fromDataItem(item).getDataMap();
                     ArrayList<String> locations = dataMap.getStringArrayList("com.oscode.pointr.key.data");
                     this.locations = importData(locations);
-                    Locals front = maxLocal(this.locations);
-                    Log.d("CLOSEST LOCAL")
-                    name.setText(front.getName());
-                    distance.setText(front.getDistance() + "");
-                    ratingBar.setRating(front.getRating());
-                    bigarrow.setRotation(front.getDegrees());
+                    final Locals front = maxLocal(this.locations);
+                    Log.d("CLOSEST LOCAL", front.getName()+front.getDistance()+front.getRating()+front.getDegrees());
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            name.setText(front.getName());
+                            distance.setText(front.getDistance() + "");
+                            ratingBar.setRating(front.getRating());
+                            bigarrow.setRotation(front.getDegrees());
+                        }
+                    });
+
                     for (Locals l : this.locations) {
                         arrows.add(new LittleArrow(getApplicationContext(), l.getDegrees()));
                     }
