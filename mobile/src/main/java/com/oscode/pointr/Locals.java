@@ -24,6 +24,6 @@ public class Locals {
 
     @Override
     public String toString() {
-        return name + "\n" + rating + "\n" + latitude + "\n" + longitude + "\n" + description;
+        return name + "\t" + rating + "\t" + latitude + "\t" + longitude + "\t" + description;
     }
 }
