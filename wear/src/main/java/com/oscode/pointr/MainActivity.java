@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.wearable.view.WatchViewStub;
 import android.util.Log;
+import android.view.View;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.widget.ImageView;
@@ -79,7 +80,7 @@ public class MainActivity extends Activity implements
     ArrayList<LittleArrow> arrows = new ArrayList<LittleArrow>();
     TextView name;
     TextView distance;
-
+    RelativeLayout relativeLayout;
 
     class LocalsComparator implements Comparator<Locals>{
 
@@ -115,11 +116,12 @@ public class MainActivity extends Activity implements
                 stars = (LayerDrawable) ratingBar.getProgressDrawable();
                 stars.getDrawable(2).setColorFilter(Color.rgb(0x2d, 0x9c, 0x93), PorterDuff.Mode.SRC_ATOP);
                 bigarrow = (ImageView) findViewById(R.id.big_arrow);
+                bigarrow.setVisibility(View.INVISIBLE);
                 name = (TextView) findViewById(R.id.place_name);
                 distance = (TextView) findViewById(R.id.distance);
 //                animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.rotate);
 //                bigarrow.startAnimation(animation);
-                final RelativeLayout relativeLayout = (RelativeLayout) findViewById(R.id.relLayout);
+                relativeLayout = (RelativeLayout) findViewById(R.id.relLayout);
 //                Handler handler = new Handler();
 //                handler.postDelayed(new Runnable(){
 //                    @Override
@@ -188,6 +190,10 @@ public class MainActivity extends Activity implements
                     for (Locals l : this.locations) {
                         arrows.add(new LittleArrow(getApplicationContext(), l.getDegrees()));
                     }
+                    for (LittleArrow l : arrows) {
+                        relativeLayout.addView(l);
+                    }
+                    relativeLayout.invalidate();
                 }
 
             } else if (event.getType() == DataEvent.TYPE_DELETED) {
