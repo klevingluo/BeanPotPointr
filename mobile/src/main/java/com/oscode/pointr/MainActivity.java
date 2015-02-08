@@ -76,8 +76,8 @@ public class MainActivity extends ActionBarActivity implements
         PutDataRequest putDataReq = putDataMapReq.asPutDataRequest();
         PendingResult<DataApi.DataItemResult> pendingResult =
                 Wearable.DataApi.putDataItem(mGoogleApiClient, putDataReq);
-        db.setText(db.getText()+ "\nData sent to watch!" );
-        db.setText(db.getText()+ "\n"+ toSend);
+        db.setText(db.getText() + "\nData sent to watch!");
+        db.setText(db.getText() + "\n" + toSend);
 //        runOnUiThread(new Runnable() {
 //            @Override
 //            public void run() {
@@ -105,7 +105,7 @@ public class MainActivity extends ActionBarActivity implements
     @Override
     public void onConnected(Bundle bundle) {
         Wearable.DataApi.addListener(mGoogleApiClient, this);
-        db.setText(db.getText()+"\nGoogle API connected!");
+        db.setText(db.getText() + "\nGoogle API connected!");
     }
 
     @Override
@@ -132,8 +132,8 @@ public class MainActivity extends ActionBarActivity implements
                         @Override
                         public void run() {
 
-                            db.setText(db.getText()+"\nLocation recieved from watch!");
-                            db.setText(db.getText()+"\n"+ location.get(0) + ", " + location.get(1));
+                            db.setText(db.getText() + "\nLocation recieved from watch!");
+                            db.setText(db.getText() + "\n" + location.get(0) + ", " + location.get(1));
                         }
                     });
 
@@ -146,6 +146,6 @@ public class MainActivity extends ActionBarActivity implements
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
-        db.setText(db.getText()+"\nConnection failed!");
+        db.setText(db.getText() + "\nConnection failed!");
     }
 }

@@ -16,16 +16,15 @@ import java.util.ArrayList;
 
 /**
  * Code sample for accessing the Yelp API V2.
- *
+ * <p/>
  * This program demonstrates the capability of the Yelp API version 2.0 by using the Search API to
  * query for businesses by a search term and location, and the Business API to query additional
  * information about the top result from the search query.
- *
- * <p>
+ * <p/>
+ * <p/>
  * See <a href="http://www.yelp.com/developers/documentation">Yelp Documentation</a> for more info.
- *
  */
-public class YelpAPI extends AsyncTask<Void, Void, Void>{
+public class YelpAPI extends AsyncTask<Void, Void, Void> {
 
     private static final String API_HOST = "api.yelp.com";
     private static final String SEARCH_PATH = "/v2/search";
@@ -53,10 +52,10 @@ public class YelpAPI extends AsyncTask<Void, Void, Void>{
     /**
      * Setup the Yelp API OAuth credentials.
      *
-     * @param consumerKey Consumer key
+     * @param consumerKey    Consumer key
      * @param consumerSecret Consumer secret
-     * @param token Token
-     * @param tokenSecret Token secret
+     * @param token          Token
+     * @param tokenSecret    Token secret
      */
     public YelpAPI(String consumerKey, String consumerSecret, String token, String tokenSecret, String latitude, String longitude) {
         this.latitude = latitude;
@@ -84,7 +83,7 @@ public class YelpAPI extends AsyncTask<Void, Void, Void>{
 
     /**
      * Main entry for sample Yelp API requests.
-     * <p>
+     * <p/>
      * After entering your OAuth credentials, execute <tt><b>run.sh</b></tt> to run this example.
      */
     private JSONObject queryYelp() {
@@ -113,7 +112,7 @@ public class YelpAPI extends AsyncTask<Void, Void, Void>{
 
     /**
      * Creates and sends a request to the Search API by term and location.
-     * <p>
+     * <p/>
      * See <a href="http://www.yelp.com/developers/documentation/v2/search_api">Yelp Search API V2</a>
      * for more info.
      *
@@ -122,7 +121,7 @@ public class YelpAPI extends AsyncTask<Void, Void, Void>{
     public String searchForBusinessesByLocation() {
         OAuthRequest request = createOAuthRequest(SEARCH_PATH);
         request.addQuerystringParameter("term", term);
-        request.addQuerystringParameter("ll", latitude+","+longitude);
+        request.addQuerystringParameter("ll", latitude + "," + longitude);
         request.addQuerystringParameter("limit", String.valueOf(SEARCH_LIMIT));
         return sendRequestAndGetResponse(request);
     }

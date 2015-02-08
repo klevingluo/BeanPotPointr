@@ -15,8 +15,10 @@ public class Locals {
             if (obj.has("name")) this.name = obj.getString("name");
             if (obj.has("rating")) this.rating = obj.getDouble("rating");
             if (obj.has("snippet_text")) this.description = obj.getString("snippet_text");
-            if (obj.has("location")) this.latitude = obj.getJSONObject("location").getJSONObject("coordinate").getDouble("latitude");
-            if (obj.has("location")) this.longitude = obj.getJSONObject("location").getJSONObject("coordinate").getDouble("longitude");
+            if (obj.has("location"))
+                this.latitude = obj.getJSONObject("location").getJSONObject("coordinate").getDouble("latitude");
+            if (obj.has("location"))
+                this.longitude = obj.getJSONObject("location").getJSONObject("coordinate").getDouble("longitude");
         } catch (JSONException e) {
             e.printStackTrace();
         }
