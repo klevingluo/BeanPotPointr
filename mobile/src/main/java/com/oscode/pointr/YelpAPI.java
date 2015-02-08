@@ -46,7 +46,7 @@ public class YelpAPI extends AsyncTask<Void, Void, Void>{
     private OAuthService service;
     private Token accessToken;
     private JSONObject data;
-    private boolean isUpdated = false;
+    //private boolean isUpdated = false;
 
     /**
      * Setup the Yelp API OAuth credentials.
@@ -70,6 +70,41 @@ public class YelpAPI extends AsyncTask<Void, Void, Void>{
                 new ServiceBuilder().provider(TwoStepOAuth.class).apiKey(CONSUMER_KEY)
                         .apiSecret(CONSUMER_SECRET).build();
         this.accessToken = new Token(TOKEN, TOKEN_SECRET);
+    }
+
+    @Override
+    protected Void doInBackground(Void... params) {
+        this.data = queryYelp();
+        return null;
+    }
+
+    /**
+     * Main entry for sample Yelp API requests.
+     * <p>
+     * After entering your OAuth credentials, execute <tt><b>run.sh</b></tt> to run this example.
+     */
+    private JSONObject queryYelp() {
+        YelpAPI yelpApi = new YelpAPI(CONSUMER_KEY, CONSUMER_SECRET, TOKEN, TOKEN_SECRET);
+        return queryAPI(yelpApi);
+    }
+
+    /**
+     * Queries the Search API based on the command line arguments and takes the first result to query
+     * the Business API.
+     *
+     * @param yelpApi <tt>YelpAPI</tt> service instance
+     */
+    private static JSONObject queryAPI(YelpAPI yelpApi) {
+        // Get JSON
+        String searchResponseJSON =
+                yelpApi.searchForBusinessesByLocation();
+        JSONObject parser = null;
+        try {
+            parser = new JSONObject(searchResponseJSON);
+        } catch (JSONException e) {
+            Log.e("IMPORTANT_TAG", "json exception");
+        }
+        return parser;
     }
 
     /**
@@ -106,74 +141,23 @@ public class YelpAPI extends AsyncTask<Void, Void, Void>{
      * @return <tt>String</tt> body of API response
      */
     private String sendRequestAndGetResponse(OAuthRequest request) {
-        System.out.println("Querying " + request.getCompleteUrl() + " ...");
         this.service.signRequest(this.accessToken, request);
         Response response = request.send();
 
         return response.getBody();
     }
 
-    /**
-     * Queries the Search API based on the command line arguments and takes the first result to query
-     * the Business API.
-     *
-     * @param yelpApi <tt>YelpAPI</tt> service instance
-     */
-    private static JSONObject queryAPI(YelpAPI yelpApi) {
-        String searchResponseJSON =
-                yelpApi.searchForBusinessesByLocation();
-        Log.e("TEST", searchResponseJSON.toString());
-        JSONObject parser = null;
-        try {
-            parser = new JSONObject(searchResponseJSON);
-        } catch (JSONException e) {
-            Log.e("IMPORTANT_TAG", "json exception");
-        }
-        return parser;
-    }
-
-    @Override
-    protected Void doInBackground(Void... params) {
-        Log.e("TEST", "queryingYelp");
-        this.data = queryYelp();
-        return null;
-    }
-
-    /**
-     * Main entry for sample Yelp API requests.
-     * <p>
-     * After entering your OAuth credentials, execute <tt><b>run.sh</b></tt> to run this example.
-     */
-    private JSONObject queryYelp() {
-        YelpAPI yelpApi = new YelpAPI(CONSUMER_KEY, CONSUMER_SECRET, TOKEN, TOKEN_SECRET);
-        Log.e("TEST", "queryingAPI");
-        return queryAPI(yelpApi);
-    }
-
     public void update(String latitude, String longitude) {
         this.latitude = latitude;
         this.longitude = longitude;
-        this.isUpdated = false;
-        this.doInBackground();
+    }
+
+    public JSONObject getData() {
+        return this.data;
     }
 
     @Override
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
-        this.isUpdated = true;
-        //MainActivity.sendData();
-    }
-
-    public JSONObject getData() {
-//        this.update("0", "0");
-//        //TODO: call GPS function and pass output into update function
-//        while(!isUpdated) {
-//            try {
-//                Thread.sleep(10);
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
-//        }
-        return this.data;
     }
 }
