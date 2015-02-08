@@ -212,7 +212,7 @@ public class MainActivity extends Activity implements
     private ArrayList<Locals> importData(ArrayList<String> dat){
         ArrayList<Locals> ret = new ArrayList<Locals>();
         for(String s : dat){
-            String[] s2 = s.split("\t");
+            String[] s2 = s.split("\n");
             Locals l = new Locals(s2[0], (float)Double.parseDouble(s2[1]), Double.parseDouble(s2[2]),Double.parseDouble(s2[3]), s2[4]);
             l.updateDistance(mLastLocation.getLatitude(), mLastLocation.getLongitude());
             ret.add(l);
