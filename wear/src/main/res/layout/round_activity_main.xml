@@ -15,16 +15,17 @@
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <com.oscode.pointr.AutoResizeTextView
+        android:layout_width="140dp"
+        android:layout_height="50dp"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="Chipotle"
         android:id="@+id/place_name"
         android:layout_above="@+id/ratingBar"
         android:layout_centerHorizontal="true"
         android:textColor="@color/black"
-        android:textSize="30sp" />
+        android:textSize="30sp"
+        android:gravity="center" />
 
     <TextView
         android:layout_width="wrap_content"
