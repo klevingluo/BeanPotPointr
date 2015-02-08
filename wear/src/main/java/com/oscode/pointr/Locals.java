@@ -60,10 +60,17 @@ public class Locals {
     }
 
     public void updateDistance(double myLat, double myLong) {
-        double deltLat = latitude - myLat;
-        double deltLong = longitude - myLong;
-        distance = Math.sqrt(deltLat*deltLat + deltLong*deltLong);
-        degrees = (float) ((deltLong > 0 ? Math.atan(deltLat/deltLong) : Math.PI + Math.atan(deltLat/deltLong))%(2*Math.PI));
+        double R = 6371000;
+        double lat1 = Math.toRadians(myLat);
+        double lat2 = Math.toRadians(latitude);
+        double deltLat = Math.toRadians(latitude - myLat);
+        double deltLong = Math.toRadians(longitude - myLong);
+        double a = (Math.sin(deltLat / 2) * Math.sin(deltLat / 2)) + (Math.cos(lat1) * Math.cos(lat2) * Math.sin(deltLong / 2) * Math.sin(deltLong / 2));
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        double d = R * c * 0.62137;//in miles
+        distance = d;
+        degrees = (float) ((deltLong < 0 ? Math.atan(deltLat/deltLong) : Math.PI + Math.atan(deltLat/deltLong))%(2*Math.PI));
+        degrees *= 180/Math.PI;
     }
 
     public float getDegrees() {
