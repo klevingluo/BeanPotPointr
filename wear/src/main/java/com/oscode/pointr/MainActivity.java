@@ -105,7 +105,6 @@ public class MainActivity extends Activity implements
         mSensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         mMagnetometer = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
-
         configureGPS();
 
                 stub.setOnLayoutInflatedListener(new WatchViewStub.OnLayoutInflatedListener() {
@@ -175,6 +174,7 @@ public class MainActivity extends Activity implements
                     ArrayList<String> locations = dataMap.getStringArrayList("com.oscode.pointr.key.data");
                     this.locations = importData(locations);
                     Locals front = maxLocal(this.locations);
+                    Log.d("CLOSEST LOCAL")
                     name.setText(front.getName());
                     distance.setText(front.getDistance() + "");
                     ratingBar.setRating(front.getRating());
@@ -285,6 +285,8 @@ public class MainActivity extends Activity implements
 
     @Override
     public void onConnected(Bundle bundle) {
+
+        Wearable.DataApi.addListener(mGoogleApiClient, this);
         LocationRequest locationRequest = LocationRequest.create()
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
                 .setInterval(3000)
@@ -356,6 +358,7 @@ public class MainActivity extends Activity implements
         mGoogleApiClient.disconnect();
         mSensorManager.unregisterListener(this, mAccelerometer);
         mSensorManager.unregisterListener(this, mMagnetometer);
+        Wearable.DataApi.removeListener(mGoogleApiClient, this);
     }
 
     @Override
@@ -363,6 +366,7 @@ public class MainActivity extends Activity implements
         super.onResume();
         mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_GAME);
         mSensorManager.registerListener(this, mMagnetometer, SensorManager.SENSOR_DELAY_GAME);
+        mGoogleApiClient.connect();
     }
 
 

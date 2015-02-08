@@ -33,8 +33,8 @@ public class YelpAPI extends AsyncTask<Void, Void, Void>{
     private static final int SEARCH_LIMIT = 19;
     private static final int SORT_TYPE = 1;
     private String term = "food";
-    private String longitude = "0";
-    private String latitude = "0";
+    private String longitude;
+    private String latitude;
 
     /*
      * Update OAuth credentials below from the Yelp Developers API site:
@@ -58,7 +58,9 @@ public class YelpAPI extends AsyncTask<Void, Void, Void>{
      * @param token Token
      * @param tokenSecret Token secret
      */
-    public YelpAPI(String consumerKey, String consumerSecret, String token, String tokenSecret) {
+    public YelpAPI(String consumerKey, String consumerSecret, String token, String tokenSecret, String latitude, String longitude) {
+        this.latitude = latitude;
+        this.longitude = longitude;
         this.service =
                 new ServiceBuilder().provider(TwoStepOAuth.class).apiKey(consumerKey)
                         .apiSecret(consumerSecret).build();
@@ -86,7 +88,7 @@ public class YelpAPI extends AsyncTask<Void, Void, Void>{
      * After entering your OAuth credentials, execute <tt><b>run.sh</b></tt> to run this example.
      */
     private JSONObject queryYelp() {
-        YelpAPI yelpApi = new YelpAPI(CONSUMER_KEY, CONSUMER_SECRET, TOKEN, TOKEN_SECRET);
+        YelpAPI yelpApi = new YelpAPI(CONSUMER_KEY, CONSUMER_SECRET, TOKEN, TOKEN_SECRET, latitude, longitude);
         return queryAPI(yelpApi);
     }
 

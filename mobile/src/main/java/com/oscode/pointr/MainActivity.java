@@ -77,6 +77,7 @@ public class MainActivity extends ActionBarActivity implements
         PendingResult<DataApi.DataItemResult> pendingResult =
                 Wearable.DataApi.putDataItem(mGoogleApiClient, putDataReq);
         db.setText(db.getText()+ "\nData sent to watch!" );
+        db.setText(db.getText()+ "\n"+ toSend);
 //        runOnUiThread(new Runnable() {
 //            @Override
 //            public void run() {
@@ -124,7 +125,7 @@ public class MainActivity extends ActionBarActivity implements
                 }
                 if (item.getUri().getPath().compareTo("/location") == 0) {
                     DataMap dataMap = DataMapItem.fromDataItem(item).getDataMap();
-                    ArrayList<String> location = dataMap.getStringArrayList("com.oscode.pointr.key.location");
+                    final ArrayList<String> location = dataMap.getStringArrayList("com.oscode.pointr.key.location");
                     jsonProcessor.update(location.get(0), location.get(1));
 
                     runOnUiThread(new Runnable() {
@@ -132,7 +133,7 @@ public class MainActivity extends ActionBarActivity implements
                         public void run() {
 
                             db.setText(db.getText()+"\nLocation recieved from watch!");
-
+                            db.setText(db.getText()+"\n"+ location.get(0) + ", " + location.get(1));
                         }
                     });
 
