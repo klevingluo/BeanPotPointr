@@ -21,7 +21,7 @@ public class JSONProcessor {
         if (yelpAPI == null) {
             yelpAPI = new YelpAPI(latitude, longitude);
         }
-        if (locations == null) {
+//        if (locations == null) {
 //            JSONArray data = null;
             yelpAPI.execute();
 //            while(yelpAPI.getData() == null){
@@ -44,8 +44,8 @@ public class JSONProcessor {
 //                    e.printStackTrace();
 //                }
 //            }
-        } else {
-            //TODO: for loop with each locals updating its distance
-        }
+//        } else {
+//            //TODO: for loop with each locals updating its distance
+//        }
     }
 }
